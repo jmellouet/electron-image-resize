@@ -1,5 +1,6 @@
 const form = document.querySelector('#img-form');
 const img = document.querySelector('#img');
+const bidonBtn = document.querySelector('#bidon');
 const outputPath = document.querySelector('#output-path');
 const filename = document.querySelector('#filename');
 const heightInput = document.querySelector('#height');
@@ -92,7 +93,51 @@ function alertError(message) {
   });
 }
 
+// un fonction bidon
+function bidonFunction(e) {
+  // ipcRenderer.invoke('hey-open-my-dialog-now')
+  // .then((result) => {
+  //   console.log(result)
+  // })
+  ipcRenderer.send('hey-open-my-dialog-now', {
+    title: 'Title??'
+  });
+}
+
+ipcRenderer.on('open-file-paths', (event, data) => {
+  const filePath = event[0];
+
+  // Check if file is an image
+  // if (!isFileImage(file)) {
+  //   alertError('Please select an image');
+  //   return;
+  // }
+
+  // Add current height and width to form using the URL API
+  const image = new Image();
+  // image.src = URL.createObjectURL(file);
+  image.src = filePath;
+  image.onload = function () {
+    widthInput.value = this.width;
+    heightInput.value = this.height;
+  };
+
+  // Show form, image name and output path
+  form.style.display = 'block';
+  // filename.innerHTML = img.files[0].name;
+
+  console.log(filePath);
+
+  var nameOfFile = filePath.substring(filePath.lastIndexOf('\\')+1);
+  console.log(nameOfFile);
+  filename.innerHTML = nameOfFile;
+  outputPath.innerText = path.join(os.homedir(), 'imageresizer');
+});
+
 // File select listener
-img.addEventListener('change', loadImage);
+img.addEventListener('change', loadImage)
 // Form submit listener
-form.addEventListener('submit', resizeImage);
+form.addEventListener('submit', resizeImage)
+
+// bidon button test
+bidonBtn.addEventListener('click', bidonFunction)

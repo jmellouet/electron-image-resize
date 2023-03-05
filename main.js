@@ -2,7 +2,7 @@ const path = require('path');
 const os = require('os');
 const fs = require('fs');
 const resizeImg = require('resize-img');
-const { app, BrowserWindow, Menu, ipcMain, shell } = require('electron');
+const { app, BrowserWindow, dialog, Menu, ipcMain, shell } = require('electron');
 
 const isDev = process.env.NODE_ENV !== 'production';
 const isMac = process.platform === 'darwin';
@@ -31,6 +31,7 @@ function createMainWindow() {
 
     // mainWindow.loadURL(`file://${__dirname}/renderer/index.html`);
    mainWindow.loadFile(path.join(__dirname, './renderer/index.html'));
+   
 }
 
 // About Window
@@ -111,6 +112,13 @@ const menu = [
       ]
     : []),
 ];
+
+ipcMain.on('hey-open-my-dialog-now', (event, data) => {
+  let filePaths = [];
+  dialog.showOpenDialog({ properties: ['openFile', 'multiSelections'] }, data).then(result => {
+    event.sender.send('open-file-paths', result.filePaths);
+  });
+});
 
 // Respond to the resize image event
 ipcMain.on('image:resize', (e, options) => {
